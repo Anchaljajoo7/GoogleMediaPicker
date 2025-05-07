@@ -26,13 +26,13 @@ class MainActivity : AppCompatActivity() {
                 if (uri != null) {
                     Log.d("PhotoPicker", "Selected URI: $uri")
                     // You can set the image to an ImageView or upload it
-                    bindingMainActivity.imageView.setImageURI(uri)
+                    bindingMainActivity.imageViewSingle.setImageURI(uri)
                 } else {
                     Log.d("PhotoPicker", "No media selected")
                 }
             }
 
-        bindingMainActivity.button.setOnClickListener {
+        bindingMainActivity.buttonForSingle.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
