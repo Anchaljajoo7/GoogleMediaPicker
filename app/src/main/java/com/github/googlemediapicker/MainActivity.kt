@@ -14,25 +14,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         bindingMainActivity = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bindingMainActivity.root)
-        initialSetup()
         clickEvent()
 
 
     }
 
     private fun clickEvent() {
-        val pickMedia =
+        val pickMediaImages =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
                     Log.d("PhotoPicker", "Selected URI: $uri")
-                    // You can set the image to an ImageView or upload it
+
                     bindingMainActivity.imageViewSingle.setImageURI(uri)
                 } else {
                     Log.d("PhotoPicker", "No media selected")
                 }
             }
 
-        val pickMedia1 =
+        val pickMediaBoth =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
                     val mimeType = contentResolver.getType(uri)
@@ -41,15 +40,15 @@ class MainActivity : AppCompatActivity() {
                     Log.d("PhotoPicker", "MIME Type: $mimeType")
 
                     if (mimeType?.startsWith("video") == true) {
-                        bindingMainActivity.imageViewWithVideoSingle.visibility = View.GONE
-                        bindingMainActivity.videoViewSingle.apply {
+                        bindingMainActivity.imageViewBoth.visibility = View.GONE
+                        bindingMainActivity.videoViewBoth.apply {
                             setVideoURI(uri)
                             visibility = View.VISIBLE
                             start()
                         }
                     } else if (mimeType?.startsWith("image") == true) {
-                        bindingMainActivity.videoViewSingle.visibility = View.GONE
-                        bindingMainActivity.imageViewWithVideoSingle.apply {
+                        bindingMainActivity.videoViewBoth.visibility = View.GONE
+                        bindingMainActivity.imageViewBoth.apply {
                             setImageURI(uri)
                             visibility = View.VISIBLE
                         }
@@ -62,20 +61,36 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        bindingMainActivity.buttonForSingle.setOnClickListener {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        val pickMediaVideo =
+            registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+
+                Log.d("Anchal", "clickEvent: "+uri)
+                if (uri != null) {
+                    bindingMainActivity.videoView.apply {
+                        setVideoURI(uri)
+                        visibility = View.VISIBLE
+                        start()
+                    }
+                } else {
+                    Log.d("PhotoPicker", "No media selected")
+                }
+            }
+
+        bindingMainActivity.buttonSingleImage.setOnClickListener {
+            pickMediaImages.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-        bindingMainActivity.buttonForSingleVideoImage.setOnClickListener {
-            pickMedia1.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+        bindingMainActivity.buttonSingleVideoImage.setOnClickListener {
+            pickMediaBoth.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
 
+        }
+
+        bindingMainActivity.buttonSingleVideo.setOnClickListener {
+            Log.d("PhotoPicker", "Launching video picker")
+            pickMediaVideo.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
         }
 
     }
 
-    private fun initialSetup() {
-        // Inside your Activity or Fragment
 
-
-    }
 }
