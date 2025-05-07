@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "GoogleMediaPicker"
 include(":app")
- 
+include(":core")
