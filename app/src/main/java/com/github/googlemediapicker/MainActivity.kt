@@ -2,7 +2,7 @@ package com.github.googlemediapicker
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
+import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -32,8 +32,43 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        val pickMedia1 =
+            registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                if (uri != null) {
+                    val mimeType = contentResolver.getType(uri)
+
+                    Log.d("PhotoPicker", "Selected URI: $uri")
+                    Log.d("PhotoPicker", "MIME Type: $mimeType")
+
+                    if (mimeType?.startsWith("video") == true) {
+                        bindingMainActivity.imageViewWithVideoSingle.visibility = View.GONE
+                        bindingMainActivity.videoViewSingle.apply {
+                            setVideoURI(uri)
+                            visibility = View.VISIBLE
+                            start()
+                        }
+                    } else if (mimeType?.startsWith("image") == true) {
+                        bindingMainActivity.videoViewSingle.visibility = View.GONE
+                        bindingMainActivity.imageViewWithVideoSingle.apply {
+                            setImageURI(uri)
+                            visibility = View.VISIBLE
+                        }
+                    } else {
+                        Log.d("PhotoPicker", "Unsupported media type.")
+                    }
+
+                } else {
+                    Log.d("PhotoPicker", "No media selected")
+                }
+            }
+
         bindingMainActivity.buttonForSingle.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+
+        bindingMainActivity.buttonForSingleVideoImage.setOnClickListener {
+            pickMedia1.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+
         }
 
     }
